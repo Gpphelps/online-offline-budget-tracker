@@ -5,7 +5,8 @@ const FILEs_TO_CACHE = [
     "/index.js",
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
-    "/manifest.webmanifest"
+    "/manifest.webmanifest",
+    "/db.js"
 ];
 
 const PRECACHE = "precache-v1";
