@@ -1,33 +1,31 @@
 const FILEs_TO_CACHE = [
-    "./",
-    "./index.html",
-    "./index.js",
-    "./style.css",
-    "./icons/icon-192x192.png",
-    "./icons/icon-512x512.png",
-    "./manifest.webmanifest"
+    "/",
+    "/index.html",
+    "/style.css",
+    "/icons/icon-192x192.png",
+    "/icons/icon-512x512.png",
+    "/manifest.webmanifest"
 ];
 
-const CACHE_NAME = "static-cache-v2";
+const PRECACHE = "precache-v1";
 const RUNTIME = "runtime";
-const DATA_CACHE_NAME = "data-cache-v1";
+
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches
-        .open(CACHE_NAME)
+        caches.open(PRECACHE)
         .then((cache) => cache.addAll(FILE_TO_CACHE))
         .then(self.skipWaiting())
     );
 });
 
 self.addEventListener("acitivate", (event) => {
-    const currentCaches = [CACHE_NAME, RUNTIME];
+    const currentCaches = [PRECACHE, RUNTIME];
     event.waitUntil(
         caches
         .keys()
         .then((cacheNames) => {
-            return cacheNames.filter((cacheNames) => !currentCaches.includes(cacheNames));
+            return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
         })
         .then((cachesToDelete) => {
             return Promise.all(

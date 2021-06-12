@@ -3,33 +3,32 @@ const request = indexedDB.open("budget", 1);
 
 // Creates the objectStore when there is a new version of the DB is requested
 request.onupgradeneeded = function (event) {
-    db = event.target.result;
+    const db = event.target.result;
     db.createObjectStore("pending", { autoIncrement: true });
 };
 
 request.onsuccess = function (event) {
     db = event.target.result;
     // Checks if application is online before the DB gets read
-    if (navigator.online) {
-        checkDB();
+    if (navigator.onLine) {
+        checkDatabase();
     }
 };
 
 // If there is an error with the request it is logged to the console
 request.onerror = function (event) {
-    console.log(event.target.error)
+    console.log(event.target.errorCode)
 };
 
 // Stores the transactions made when offline to the indexdb
 function saveRecord(record) {
     const transaction = db.transaction(["pending"], "readwrite");
     const store = transaction.objectStore("pending");
-
     store.add(record);
-};
+}
 
 // Checks the indexdb for stored transactions and submits a post request to the mongoose db with the stored transactions
-function checkDB() {
+function checkDatabase() {
     const transaction = db.transaction(["pending"], "readwrite");
     const store = transaction.objectStore("pending");
     const getAll = store.getAll();
@@ -41,7 +40,7 @@ function checkDB() {
                 body: JSON.stringify(getAll.result),
                 headers: {
                     Accept: "application/json, text/plain, */*",
-                    "content-type": "application/json" 
+                    "Content-Type": "application/json" 
                 }
             })
             .then(response => response.json())
@@ -56,4 +55,4 @@ function checkDB() {
 };
 
 // Listens for the application coming online
-window.addEventListener("online", checkDB);
+window.addEventListener("online", checkDatabase);
