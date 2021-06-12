@@ -2,6 +2,7 @@ const FILEs_TO_CACHE = [
     "/",
     "/index.html",
     "/style.css",
+    "/index.js",
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
     "/manifest.webmanifest"
@@ -19,6 +20,7 @@ self.addEventListener("install", (event) => {
     );
 });
 
+// The activate handler takes care of cleaning up old caches.
 self.addEventListener("acitivate", (event) => {
     const currentCaches = [PRECACHE, RUNTIME];
     event.waitUntil(

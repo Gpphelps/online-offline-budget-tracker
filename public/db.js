@@ -3,7 +3,7 @@ const request = indexedDB.open("budget", 1);
 
 // Creates the objectStore when there is a new version of the DB is requested
 request.onupgradeneeded = function (event) {
-    const db = event.target.result;
+    db = event.target.result;
     db.createObjectStore("pending", { autoIncrement: true });
 };
 
