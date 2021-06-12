@@ -1,4 +1,4 @@
-const FILEs_TO_CACHE = [
+const FILES_TO_CACHE = [
     "/",
     "/index.html",
     "/style.css",
