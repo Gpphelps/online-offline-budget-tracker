@@ -6,58 +6,54 @@ const FILES_TO_CACHE = [
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
     "/manifest.webmanifest",
-    "/db.js"
+    "/db.js",
+    'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
+    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'
 ];
 
-const PRECACHE = "precache-v1";
-const RUNTIME = "runtime";
+const CACHE_NAME = "static-budget-cache";
 
 
-self.addEventListener("install", (event) => {
+// Installs the service worker
+self.addEventListener("install", function (event) {
+    // cache static assets
     event.waitUntil(
-        caches.open(PRECACHE)
-        .then((cache) => cache.addAll(FILES_TO_CACHE))
-        .then(self.skipWaiting())
+      caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
     );
-});
-
-// The activate handler takes care of cleaning up old caches.
-self.addEventListener("acitivate", (event) => {
-    const currentCaches = [PRECACHE, RUNTIME];
+  
+    // Tells the browser to activate the service worker immediately once it has finished installing
+    self.skipWaiting();
+  });
+  
+  // Activates cache
+  self.addEventListener("activate", function(event) {
     event.waitUntil(
-        caches
-        .keys()
-        .then((cacheNames) => {
-            return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
-        })
-        .then((cachesToDelete) => {
-            return Promise.all(
-                cachesToDelete.map((cacheToDelete) => {
-                    return caches.delete(cacheToDelete);
-                })
-            );
-        })
-        .then(() => self.clients.claim())
-    );
-});
-
-self.addEventListener("fetch", (event) => {
-    if (event.request.url.startsWith(self.location.origin)) {
-        event.respondWith(
-            caches.match(event.request).then((cahcedResponse) => {
-                if (cahcedResponse) {
-                    return cahcedResponse;
-                }
-
-                return caches.open(RUNTIME).then((cache) => {
-                    return fetch(event.request).then((response) => {
-                        return cache.put(event.request, response.clone()).then(() => {
-                            return response;
-                        });
-                    });
-                });
-            })
+      caches.keys().then(keyList => {
+        return Promise.all(
+          keyList.map(key => {
+            if (key !== CACHE_NAME) {
+              console.log("Removing old cache data", key);
+              return caches.delete(key);
+            }
+          })
         );
-    };
-});
-
+      })
+    );
+  
+    self.clients.claim();
+  });
+  
+  // Sends cached static files to the indexedDB if offline
+  self.addEventListener("fetch", (event) => {
+    // Added this to prevent console error when sending transactions offline
+    const { request } = event;
+    if(request.method === 'GET') {
+      event.respondWith(
+        caches.open(CACHE_NAME).then(cache => {
+          return cache.match(event.request).then(response => {
+            return response || fetch(event.request);
+          });
+        })
+      );
+    }
+  });
