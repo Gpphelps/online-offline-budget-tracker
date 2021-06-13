@@ -7,8 +7,6 @@ const FILES_TO_CACHE = [
     "/icons/icon-512x512.png",
     '/service-worker.js',
     "/db.js",
-    'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
-    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'
 ];
 
 const CACHE_NAME = "static-budget-cache";
@@ -18,7 +16,8 @@ const CACHE_NAME = "static-budget-cache";
 self.addEventListener("install", function (event) {
     // Caches static assets
     event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+      caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(FILES_TO_CACHE))
     );
     // Tells the browser to activate the service worker immediately once it has finished installing
     self.skipWaiting();
